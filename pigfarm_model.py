@@ -7,6 +7,7 @@ Created on Thu Nov  7 12:21:53 2019
 import random
 from scipy.stats import  powerlaw, expon,lognorm,poisson
 import math
+import time
 #import pdb
 
 ###########################################################
@@ -18,11 +19,11 @@ theta = [expon.rvs(scale = 1 / 0.013),            #lambda=0.013
          lognorm.rvs(s = 1.27, scale  = math.exp(3.62)), 
          lognorm.rvs( s = 1.06 , scale  = math.exp(4.3079 )), 
          100*powerlaw.rvs(a = 1.42)]              #alpha=1.42
-birth_rate = [1.81,0.09,0.0,0.0]
-mortal_rate = [0.00042,0.08,0.01,1]             # mortality rates
+birth_rate =  [1.81,0.09,0.0,0.0]
+mortal_rate = [0.00042,0.08,0.01,1]             
 
 # T is a set of possible transactions
-T = {(0,1,60,1,0.6),(1,2,120,1,0.6),(2,3,1,1,0.7)}#,(2,3,1,1,2,0.3),(3,2,1,2,2,0.8)}
+T = {(0,1,60,1,0.6),(1,2,120,1,0.6),(2,3,1,1,0.7)}
 barnlist = []
 barn_index = {}  # dict of pairs (start_index, end_index) giving the index ranges of barns of each type
 breeding_no=47894
@@ -54,11 +55,10 @@ class Barn:
         T is a set of successor stages for current stage s
         """
         for transition in T:
-            if transition[0] == self.stage_type:           #x[0] is the index of source stage
+            if transition[0] == self.stage_type:           # transition[0] is the index of source stage
                 self.destination = transition
-                self.gis = random.choice(barn_index[transition[1]])   #x[1]: index of next stage ;#choose randomly one from all barns in the next stage as default gis for each queue in current barn
-                #self.Dlist = [] 
-                   
+                self.gis = random.choice(barn_index[transition[1]])   #transition[1]: index of next stage ;#choose randomly one from all barns in the next stage as default gis for each queue in current barn
+                                   
     def compute_free_capacity(self):
         """
         compute the current free size of barn j 
@@ -191,6 +191,8 @@ def compute_indexRange():
 def main():
              
     # initialize data:
+   
+    start = time.time()
     Bid = 0           #barn ID
     for stage in S: 
         for j in range(ns[stage]):           #create ns Barn for each stage in S
@@ -203,11 +205,11 @@ def main():
     # process all barns at time 0:
     for i in range(len(barnlist)):
         barnlist[i].create_Dlist()
-        # process all barns at time t > 0:
-    time_limit = 150
+    # process all barns at time t > 0:
+    time_limit = 400
     proceed_over_time(time_limit) 
     output.close()
-    
-
+    finish = time.time() 
+    print("the execution time is: ",finish - start)
 if __name__ == "__main__":
     main()
